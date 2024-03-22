@@ -1,0 +1,63 @@
+version: "3.4"
+
+x-common-variables: &common-variables
+  POSTGRES_DB: "database"
+  POSTGRES_HOST: "database"
+  POSTGRES_PORT: 5432
+  POSTGRES_USER: "user"
+  POSTGRES_PASSWORD: "password"
+
+services:
+  app:
+    build:
+      context: .
+      dockerfile: docker/app/Dockerfile
+    container_name: app
+    restart: always
+    environment:
+      <<: *common-variables
+    depends_on:
+      database:
+        condition: service_healthy
+    volumes:
+      - ./service/:/app
+    command: sh -c "
+      alembic upgrade head &&
+      python3 main.py"
+
+  admin:
+    build:
+      context: .
+      dockerfile: docker/admin/Dockerfile
+    container_name: admin
+    environment:
+      <<: *common-variables
+    depends_on:
+      database:
+        condition: service_healthy
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./service/:/app
+    command: "uvicorn admin:app --host 0.0.0.0 --reload"
+
+  database:
+    image: postgres:16.2
+    hostname: $${POSTGRES_HOST}
+    container_name: database
+    restart: always
+    environment:
+      <<: *common-variables
+      POSTGRES_HOST_AUTH_METHOD: "trust"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -d $${POSTGRES_DB} -U $${POSTGRES_USER}"]
+      interval: 3s
+      timeout: 3s
+      retries: 5
+    ports:
+      - "5432:5432"
+    volumes:
+      - certify-bot-database:/var/lib/postgresql/data
+
+volumes:
+  certify-bot-database:
