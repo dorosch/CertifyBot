@@ -11,6 +11,8 @@ services:
   app:
     build:
       context: .
+      args:
+        APP_TYPE: bot
       dockerfile: docker/app/Dockerfile
     container_name: app
     restart: always
@@ -28,7 +30,9 @@ services:
   admin:
     build:
       context: .
-      dockerfile: docker/admin/Dockerfile
+      args:
+        APP_TYPE: admin
+      dockerfile: docker/app/Dockerfile
     container_name: admin
     environment:
       <<: *common-variables
@@ -42,7 +46,7 @@ services:
     command: "uvicorn admin:app --host 0.0.0.0 --reload"
 
   database:
-    image: postgres:16.2
+    image: postgres:16-bullseye
     hostname: $${POSTGRES_HOST}
     container_name: database
     restart: always
