@@ -4,7 +4,7 @@ from sqlalchemy import Column, Integer, String, create_engine
 from sqlalchemy.orm import declarative_base
 
 from database import engine
-from database.models import User
+from database.models import User, Course
 
 
 class UserAdmin(ModelView, model=User):
@@ -17,7 +17,15 @@ class UserAdmin(ModelView, model=User):
     )
 
 
+class CourseAdmin(ModelView, model=Course):
+    column_list = (
+        Course.id,
+        Course.name
+    )
+
+
 app = FastAPI()
 admin = Admin(app, engine, base_url="/")
 
 admin.add_view(UserAdmin)
+admin.add_view(CourseAdmin)

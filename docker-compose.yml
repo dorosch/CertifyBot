@@ -46,8 +46,7 @@ services:
     command: "uvicorn admin:app --host 0.0.0.0 --reload"
 
   database:
-    image: postgres:16-bullseye
-    hostname: $${POSTGRES_HOST}
+    image: postgres:16.2
     container_name: database
     restart: always
     environment:
