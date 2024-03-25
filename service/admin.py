@@ -4,7 +4,7 @@ from sqlalchemy import Column, Integer, String, create_engine
 from sqlalchemy.orm import declarative_base
 
 from database import engine
-from database.models import User, Course
+from database.models import User, Course, Question, Answer
 
 
 class UserAdmin(ModelView, model=User):
@@ -24,8 +24,24 @@ class CourseAdmin(ModelView, model=Course):
     )
 
 
+class QuestionAdmin(ModelView, model=Question):
+    column_list = (
+        Question.id,
+        Question.course_id
+    )
+
+
+class AnswerAdmin(ModelView, model=Answer):
+    column_list = (
+        Answer.id,
+        Answer.question_id
+    )
+
+
 app = FastAPI()
 admin = Admin(app, engine, base_url="/")
 
 admin.add_view(UserAdmin)
 admin.add_view(CourseAdmin)
+admin.add_view(QuestionAdmin)
+admin.add_view(AnswerAdmin)

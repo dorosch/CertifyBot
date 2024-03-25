@@ -12,3 +12,7 @@ class UserCourse(Model):
 class Course(Model):
     name = Column(String, nullable=False)
     users = relationship("User", secondary="user_course", back_populates="courses")
+    questions = relationship("Question", backref="course", lazy=True)
+
+    def __str__(self) -> str:
+        return f"{self.id} - {self.name}"
