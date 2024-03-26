@@ -34,7 +34,8 @@ class QuestionAdmin(ModelView, model=Question):
 class AnswerAdmin(ModelView, model=Answer):
     column_list = (
         Answer.id,
-        Answer.question_id
+        Answer.question_id,
+        Answer.is_correct
     )
 
 
