@@ -1,8 +1,8 @@
-"""Fill data into Question and Answer tables
+"""Fill data SAA-C03
 
-Revision ID: 8caeed8a5a33
-Revises: 66e86e8dfbbc
-Create Date: 2024-03-26 13:40:16.365071
+Revision ID: 97e45c2507c6
+Revises: 8caeed8a5a33
+Create Date: 2024-03-27 19:44:51.767786
 
 """
 import sys
@@ -12,24 +12,22 @@ BASE_PATH = pathlib.Path(__file__).parent.resolve()
 sys.path.append(BASE_PATH.parent.parent.resolve())
 
 import json
-from datetime import datetime
 from typing import Sequence, Union
 
 from alembic import op
 import sqlalchemy as sa
-from sqlalchemy import String, Integer, Boolean
 from sqlalchemy.sql import select, insert, delete
 
 from database.models import Course, Question, Answer
 
 
-revision: str = '8caeed8a5a33'
-down_revision: Union[str, None] = '66e86e8dfbbc'
+revision: str = '97e45c2507c6'
+down_revision: Union[str, None] = '8caeed8a5a33'
 branch_labels: Union[str, Sequence[str], None] = None
 depends_on: Union[str, Sequence[str], None] = None
 
-DATA_PATH = BASE_PATH / 'fixtures' / 'AWS-Developer-Associate-DVA-C02.json'
-COURSE_NAME = "AWS Certified Developer - Associate (DVA-C02)"
+DATA_PATH = BASE_PATH / 'fixtures' / 'AWS-Solutions-Architect-Associate-SAA-C03.json'
+COURSE_NAME = "AWS Certified Solutions Architect - Associate (SAA-C03)"
 
 
 def load_data() -> list[dict]:
