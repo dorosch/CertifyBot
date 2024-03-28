@@ -6,7 +6,7 @@ BASE_PATH = pathlib.Path(__file__).parent.resolve()
 PROJECT_PATH = BASE_PATH.parent.resolve()
 
 POSTGRES_DB = os.environ.get("POSTGRES_DB", "database")
-POSTGRES_HOST = os.environ.get("POSTGRES_HOST", "0.0.0.0")
+POSTGRES_HOST = os.environ.get("POSTGRES_HOST", "127.0.0.1")
 POSTGRES_PORT = os.environ.get("POSTGRES_PORT", 5432)
 POSTGRES_USER = os.environ.get("POSTGRES_USER", "user")
 POSTGRES_PASSWORD = os.environ.get("POSTGRES_PASSWORD", "password")
@@ -31,6 +31,11 @@ LOGGING_CONFIG = {
     },
     "loggers": {
         "__main__": {
+            "handlers": ["default"],
+            "level": "INFO",
+            "propagate": False
+        },
+        "aiogram": {
             "handlers": ["default"],
             "level": "INFO",
             "propagate": False

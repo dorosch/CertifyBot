@@ -5,7 +5,7 @@ from .base import Model
 
 
 class User(Model):
-    tg_id = Column(Integer, nullable=False)
+    tg_id = Column(Integer, nullable=False, unique=True)
     first_name = Column(String, nullable=False)
     last_name = Column(String, nullable=True)
     username = Column(String, nullable=True)

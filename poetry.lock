@@ -1225,6 +1225,25 @@ pymysql = ["pymysql"]
 sqlcipher = ["sqlcipher3_binary"]
 
 [[package]]
+name = "sqlalchemy-helpers"
+version = "0.13.0"
+description = "SQLAlchemy Helpers"
+optional = false
+python-versions = ">=3.8.0,<4.0.0"
+files = [
+    {file = "sqlalchemy_helpers-0.13.0-py3-none-any.whl", hash = "sha256:15667669dfd4c0bef77287b471c0a25a0664d7194947b990848362a6b3a6fad0"},
+    {file = "sqlalchemy_helpers-0.13.0.tar.gz", hash = "sha256:0a7f170300f68f990a6ac485de3955ab9bc9e66d8272ce5772b8e7a6490a77a2"},
+]
+
+[package.dependencies]
+alembic = ">=1.6.5"
+SQLAlchemy = ">=1.3.0"
+
+[package.extras]
+docs = ["Flask (>=2.0.0,<4.0.0)", "myst-parser", "sphinx", "sphinxcontrib-napoleon"]
+flask = ["Flask (>=2.0.0,<4.0.0)"]
+
+[[package]]
 name = "starlette"
 version = "0.36.3"
 description = "The little ASGI library that shines."
@@ -1617,4 +1636,4 @@ bot = ["aiogram"]
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.10"
-content-hash = "6362819367d7d12b4bac88a03a5bb31b9b58797cad94a2fc1e8e85f2529d0db0"
+content-hash = "be3de4ecee0407b6d4d665c074372142a7a098aa459b856efdf966ba8a775595"
