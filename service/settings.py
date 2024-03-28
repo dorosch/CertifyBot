@@ -40,13 +40,13 @@ LOGGING_CONFIG = {
 
 SUPPORTED_COURCES = {
     "DVA-C02": {
-        "name": "AWS Certified Developer - Associate (DVA-C02)",
-        "badge": PROJECT_PATH / "images" / "cource/AWS-Certified-Developer-Associate.png",
-        "questions": BASE_PATH / "migrations" / "fixtures" / "AWS-Developer-Associate-DVA-C02.json"
+        "NAME": "AWS Certified Developer - Associate (DVA-C02)",
+        "BADGE": PROJECT_PATH / "images" / "cource/AWS-Certified-Developer-Associate.png",
+        "QUESTIONS": BASE_PATH / "migrations" / "fixtures" / "AWS-Developer-Associate-DVA-C02.json"
     },
     "SAA-C03": {
-        "name": "AWS Certified Solutions Architect - Associate (SAA-C03)",
-        "badge": PROJECT_PATH / "images" / "cource/AWS-Certified-Solutions-Architect-Associate.png",
-        "questions": BASE_PATH / "migrations" / "fixtures" / "AWS-Solutions-Architect-Associate-SAA-C03.json"
+        "NAME": "AWS Certified Solutions Architect - Associate (SAA-C03)",
+        "BADGE": PROJECT_PATH / "images" / "cource/AWS-Certified-Solutions-Architect-Associate.png",
+        "QUESTIONS": BASE_PATH / "migrations" / "fixtures" / "AWS-Solutions-Architect-Associate-SAA-C03.json"
     }
 }

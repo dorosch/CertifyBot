@@ -1,5 +1,5 @@
 from sqlalchemy import Column, String, Integer, ForeignKey
-from sqlalchemy.orm import relationship
+from sqlalchemy.orm import relationship, backref
 
 from .base import Model
 
@@ -12,7 +12,7 @@ class UserCourse(Model):
 class Course(Model):
     name = Column(String, nullable=False)
     users = relationship("User", secondary="user_course", back_populates="courses")
-    questions = relationship("Question", backref="course", lazy=True)
+    questions = relationship("Question", backref=backref("course", cascade="all,delete"), lazy=True)
 
     def __str__(self) -> str:
         return f"{self.id} - {self.name}"
