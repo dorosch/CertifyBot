@@ -22,6 +22,9 @@ certifi = "^2024.2.2"
 bot = ["aiogram"]
 admin = ["fastapi", "sqladmin", "uvicorn"]
 
+[tool.poetry.dev-dependencies]
+pillow = "10.2.0"
+
 [build-system]
 requires = ["poetry-core"]
 build-backend = "poetry.core.masonry.api"
