@@ -25,6 +25,9 @@ admin = ["fastapi", "sqladmin", "uvicorn"]
 
 [tool.poetry.dev-dependencies]
 pillow = "10.2.0"
+pytest = "8.1.1"
+pytest-asyncio = "0.23.6"
+factory-boy = "3.3.0"
 
 [build-system]
 requires = ["poetry-core"]
