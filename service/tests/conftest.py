@@ -8,7 +8,7 @@ import factory.fuzzy
 
 @dataclass
 class User:
-    tg_id: int
+    id: int
     first_name: str
     last_name: Optional[str]
     username: Optional[str]
@@ -18,17 +18,20 @@ class User:
 @dataclass
 class Message:
     from_user: User
+    _answer: str = ''
 
+    async def answer(self, text: str):
+        self._answer = text
 
 class UserFactory(factory.Factory):
     class Meta:
         model = User
 
-    tg_id = factory.fuzzy.FuzzyInteger(1)
-    first_name = factory.fuzzy.FuzzyText()
-    last_name = factory.fuzzy.FuzzyText()
-    username = factory.fuzzy.FuzzyText()
-    language_code = factory.fuzzy.FuzzyText()
+    id = factory.Faker("pyint")
+    first_name = factory.Faker("first_name")
+    last_name = factory.Faker("last_name")
+    username = factory.Faker("pystr")
+    language_code = factory.Faker("locale")
 
 
 class MessageFactory(factory.Factory):
