@@ -1,7 +1,6 @@
 import os
 import pathlib
 
-
 BASE_PATH = pathlib.Path(__file__).parent.resolve()
 PROJECT_PATH = BASE_PATH.parent.resolve()
 
@@ -43,6 +42,7 @@ LOGGING_CONFIG = {
     }
 }
 
+# TODO: Fix miss spelling
 SUPPORTED_COURCES = {
     "DVA-C02": {
         "NAME": "AWS Certified Developer - Associate (DVA-C02)",

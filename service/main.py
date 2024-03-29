@@ -2,6 +2,7 @@ import asyncio
 import logging.config
 import os
 
+import aiogram.exceptions
 from aiogram import Bot, Dispatcher
 from aiogram.filters import CommandStart
 from aiogram.types import Message
@@ -35,15 +36,23 @@ async def process_start_command(message: Message):
 
 
 async def main():
-    logger.info("start application")
+    logger.info("Application start")
 
     bot = Bot(token=os.environ["TOKEN"])
 
     try:
         await dispatcher.start_polling(bot)
     finally:
-        await bot.close()
+        try:
+            await bot.close()
+        except aiogram.exceptions.TelegramRetryAfter as error:
+            # There except needed because if you call bot.close()
+            # to many telegram will block your calls for 10 minutes
+            logger.error(error)
 
 
 if __name__ == "__main__":
-    asyncio.run(main())
+    try:
+        asyncio.run(main())
+    except KeyboardInterrupt:
+        logger.info("Application stopped")
