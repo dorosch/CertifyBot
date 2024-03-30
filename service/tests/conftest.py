@@ -2,45 +2,38 @@ from typing import Optional
 from dataclasses import dataclass
 
 import pytest
-import factory
-import factory.fuzzy
+import pytest_asyncio
+from pytest_factoryboy import register
+from sqlalchemy.ext.asyncio import create_async_engine, async_sessionmaker
+
+from .factories import UserFactory, MessageFactory
+from settings import DATABASE_URL
+
+register(UserFactory)
+register(MessageFactory)
 
 
-@dataclass
-class User:
-    id: int
-    first_name: str
-    last_name: Optional[str]
-    username: Optional[str]
-    language_code: Optional[str]
+@pytest_asyncio.fixture(scope="function")
+async def async_session():
+    """
+    An asynchronous session begins a transaction and all records to 
+    the database will be rolled back after the test is completed.
+    """
+
+    engine = create_async_engine(DATABASE_URL)
+
+    connection = await engine.connect()
+    transaction = await connection.begin()
+
+    yield async_sessionmaker(
+        bind=connection, expire_on_commit=False, autoflush=False, autocommit=False
+    )
+
+    await transaction.rollback()
+    await connection.close()
 
 
-@dataclass
-class Message:
-    from_user: User
-    _answer: str = ''
-
-    async def answer(self, text: str):
-        self._answer = text
-
-class UserFactory(factory.Factory):
-    class Meta:
-        model = User
-
-    id = factory.Faker("pyint")
-    first_name = factory.Faker("first_name")
-    last_name = factory.Faker("last_name")
-    username = factory.Faker("pystr")
-    language_code = factory.Faker("locale")
-
-
-class MessageFactory(factory.Factory):
-    class Meta:
-        model = Message
-
-    from_user = factory.SubFactory(UserFactory)
-
-
-@pytest.fixture(scope="function")
-def message() -> Message:
-    return MessageFactory()
+@pytest_asyncio.fixture(scope="function", autouse=True)
+async def isolation(mocker, async_session):
+    # Database write isolation level for application
+    mocker.patch("main.async_session", return_value=async_session())
