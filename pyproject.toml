@@ -10,7 +10,7 @@ authors = [
 [tool.poetry.dependencies]
 python = "^3.10"
 alembic = "1.13.1"
-asyncpg = "0.27.0"
+asyncpg = "0.29.0"
 sqlalchemy = { version = "2.0.27", extras = ["asyncio"] }
 aiogram = { version = "3.4.1", optional = true }
 fastapi = { version = "0.110.0", optional = true }
