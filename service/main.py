@@ -9,7 +9,7 @@ from aiogram.handlers import MessageHandler, CallbackQueryHandler
 from aiogram.types import InlineKeyboardButton
 from aiogram.filters.callback_data import CallbackData
 from aiogram.utils.keyboard import InlineKeyboardBuilder
-from sqlalchemy import select, ScalarResult
+from sqlalchemy import select
 from sqlalchemy_helpers.aio import get_or_create
 
 import settings
@@ -48,12 +48,12 @@ class StartCommandHandler(MessageHandler):
             )
             await session.commit()
 
-            await self.answer_available_courses(
-                await session.scalars(select(Course))
-            )
+            courses = await session.scalars(select(Course))
 
-    async def answer_available_courses(self, courses: ScalarResult):
-        for course in courses.all():
+        await self.answer_available_courses(courses.all())
+
+    async def answer_available_courses(self, courses: list[Course]):
+        for course in courses:
             builder = InlineKeyboardBuilder()
             # TODO: Insert course code from model
             builder.add(
