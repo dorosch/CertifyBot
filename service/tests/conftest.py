@@ -1,16 +1,9 @@
-from typing import Optional
-from dataclasses import dataclass
-
-import pytest
 import pytest_asyncio
 from pytest_factoryboy import register
 from sqlalchemy.ext.asyncio import create_async_engine, async_sessionmaker
 
-from .factories import UserFactory, MessageFactory
+from .factories import UserFactory, MessageFactory, CourseFactory
 from settings import DATABASE_URL
-
-register(UserFactory)
-register(MessageFactory)
 
 
 @pytest_asyncio.fixture(scope="function")
@@ -37,3 +30,8 @@ async def async_session():
 async def isolation(mocker, async_session):
     # Database write isolation level for application
     mocker.patch("main.async_session", return_value=async_session())
+
+
+register(UserFactory)
+register(MessageFactory)
+register(CourseFactory)
