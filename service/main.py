@@ -8,7 +8,7 @@ from aiogram.filters import CommandStart
 from aiogram.handlers import MessageHandler, CallbackQueryHandler
 from aiogram.types import InlineKeyboardButton
 from aiogram.filters.callback_data import CallbackData
-from aiogram.utils.keyboard import InlineKeyboardBuilder
+from aiogram.utils.keyboard import InlineKeyboardMarkup
 from sqlalchemy import select
 from sqlalchemy_helpers.aio import get_or_create
 
@@ -54,19 +54,18 @@ class StartCommandHandler(MessageHandler):
 
     async def answer_available_courses(self, courses: list[Course]):
         for course in courses:
-            builder = InlineKeyboardBuilder()
             # TODO: Insert course code from model
-            builder.add(
-                InlineKeyboardButton(
-                    text="Start course",
-                    callback_data=CourseCallbackData(code="course code").pack()
-                )
-            )
-
             # TODO: Add course description and badge instead of name
             await self.event.answer(
                 course.name,
-                reply_markup=builder.as_markup()
+                reply_markup=InlineKeyboardMarkup(inline_keyboard=[
+                    [
+                        InlineKeyboardButton(
+                            text="Start course",
+                            callback_data=CourseCallbackData(code="course code").pack()
+                        )
+                    ]
+                ])
             )
 
 
