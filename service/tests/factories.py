@@ -1,7 +1,9 @@
 from typing import Optional
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 
 import factory
+
+from database.models import Course
 
 
 @dataclass
@@ -16,10 +18,10 @@ class User:
 @dataclass
 class Message:
     from_user: User
-    text_answer: Optional[str] = None
+    answers: list[str] = field(default_factory=list) 
 
-    async def answer(self, text: str):
-        self.text_answer = text
+    async def answer(self, text: str, *args, **kwargs):
+        self.answers.append(text)
 
 
 class UserFactory(factory.Factory):
@@ -38,3 +40,10 @@ class MessageFactory(factory.Factory):
         model = Message
 
     from_user = factory.SubFactory(UserFactory)
+
+
+class CourseFactory(factory.Factory):
+    class Meta:
+        model = Course
+
+    name = factory.Faker("name")
