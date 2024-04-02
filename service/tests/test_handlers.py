@@ -2,7 +2,7 @@ import pytest
 from sqlalchemy import select
 
 from main import StartCommandHandler
-from settings import SUPPORTED_COURCES
+from settings import SUPPORTED_COURSES
 from database.models import User, Course
 
 
@@ -32,4 +32,4 @@ class TestStartHandler:
             result = await session.scalars(select(Course))
 
             assert len(result.all()) == len(message.answers)
-            assert len(SUPPORTED_COURCES) == len(message.answers)
+            assert len(SUPPORTED_COURSES) == len(message.answers)

@@ -7,6 +7,7 @@ from aiogram import Bot, Dispatcher
 from aiogram.filters import CommandStart
 from aiogram.handlers import MessageHandler, CallbackQueryHandler
 from aiogram.types import InlineKeyboardButton
+from aiogram.utils.formatting import Text, Bold
 from aiogram.filters.callback_data import CallbackData
 from aiogram.utils.keyboard import InlineKeyboardMarkup
 from sqlalchemy import select
@@ -14,16 +15,12 @@ from sqlalchemy_helpers.aio import get_or_create
 
 import settings
 from database import async_session
-from database.models import User, Course
+from database.models import User, Course, UserCourse
 
 logging.config.dictConfig(settings.LOGGING_CONFIG)
 logger = logging.getLogger(__name__)
 
 dispatcher = Dispatcher()
-
-
-class CourseCallbackData(CallbackData, prefix="course"):
-    code: str
 
 
 @dispatcher.message(CommandStart())
@@ -54,19 +51,27 @@ class StartCommandHandler(MessageHandler):
 
     async def answer_available_courses(self, courses: list[Course]):
         for course in courses:
-            # TODO: Insert course code from model
-            # TODO: Add course description and badge instead of name
             await self.event.answer(
-                course.name,
+                **Text(
+                    Bold(course.name),
+                    "\n\n",
+                    course.description
+                ).as_kwargs(),
                 reply_markup=InlineKeyboardMarkup(inline_keyboard=[
                     [
                         InlineKeyboardButton(
                             text="Start course",
-                            callback_data=CourseCallbackData(code="course code").pack()
+                            callback_data=CourseCallbackData(
+                                code=course.code
+                            ).pack()
                         )
                     ]
                 ])
             )
+
+
+class CourseCallbackData(CallbackData, prefix="course"):
+    code: str
 
 
 @dispatcher.callback_query(CourseCallbackData.filter())
@@ -81,7 +86,24 @@ class CourseCallbackHandler(CallbackQueryHandler):
     async def handle(self):
         callback_data = CourseCallbackData.unpack(self.callback_data)
 
-        await self.message.answer(f"Course {callback_data.code} has been started!")
+        async with async_session() as session:
+            course_id = await session.scalar(
+                select(Course.id).where(Course.code == callback_data.code)
+            )
+            user_id = await session.scalar(
+                select(User.id).where(User.tg_id == self.event.from_user.id)
+            )
+
+        if course_id and user_id:
+            await UserCourse.activate(course_id, user_id)
+            await self.message.answer("Course has been started!")
+        else:
+            logger.error(
+                "Error activate course=%s for user=%s", course_id, user_id
+            )
+            await self.message.answer(
+                "I can't activate the course, try another one"
+            )
 
 
 async def main():

@@ -1,7 +1,5 @@
 from fastapi import FastAPI
 from sqladmin import Admin, ModelView
-from sqlalchemy import Column, Integer, String, create_engine
-from sqlalchemy.orm import declarative_base
 
 from database import engine
 from database.models import User, Course, Question, Answer
