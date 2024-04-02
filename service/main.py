@@ -65,7 +65,9 @@ class StartCommandHandler(MessageHandler):
                     [
                         InlineKeyboardButton(
                             text="Start course",
-                            callback_data=CourseCallbackData(code=course.code).pack()
+                            callback_data=CourseCallbackData(
+                                code=course.code
+                            ).pack()
                         )
                     ]
                 ])
@@ -90,7 +92,9 @@ class CourseCallbackHandler(CallbackQueryHandler):
             )
 
         if course:
-            await self.message.answer(f"Course {course.name} has been started!")
+            await self.message.answer(
+                f"Course {course.name} has been started!"
+            )
         else:
             await self.message.answer(
                 "I can't find the selected course. Try starting another one"
