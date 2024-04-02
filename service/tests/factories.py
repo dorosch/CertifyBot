@@ -9,6 +9,7 @@ from database.models import Course
 @dataclass
 class User:
     id: int
+    tg_id: int
     first_name: str
     last_name: Optional[str]
     username: Optional[str]
@@ -18,7 +19,7 @@ class User:
 @dataclass
 class Message:
     from_user: User
-    answers: list[str] = field(default_factory=list) 
+    answers: list[str] = field(default_factory=list)
 
     async def answer(self, text: str, *args, **kwargs):
         self.answers.append(text)
@@ -29,6 +30,7 @@ class UserFactory(factory.Factory):
         model = User
 
     id = factory.Faker("pyint")
+    tg_id = factory.Faker("pyint")
     first_name = factory.Faker("first_name")
     last_name = factory.Faker("last_name")
     username = factory.Faker("pystr")

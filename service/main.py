@@ -15,16 +15,12 @@ from sqlalchemy_helpers.aio import get_or_create
 
 import settings
 from database import async_session
-from database.models import User, Course
+from database.models import User, Course, UserCourse
 
 logging.config.dictConfig(settings.LOGGING_CONFIG)
 logger = logging.getLogger(__name__)
 
 dispatcher = Dispatcher()
-
-
-class CourseCallbackData(CallbackData, prefix="course"):
-    code: str
 
 
 @dispatcher.message(CommandStart())
@@ -74,6 +70,10 @@ class StartCommandHandler(MessageHandler):
             )
 
 
+class CourseCallbackData(CallbackData, prefix="course"):
+    code: str
+
+
 @dispatcher.callback_query(CourseCallbackData.filter())
 class CourseCallbackHandler(CallbackQueryHandler):
     """
@@ -87,17 +87,22 @@ class CourseCallbackHandler(CallbackQueryHandler):
         callback_data = CourseCallbackData.unpack(self.callback_data)
 
         async with async_session() as session:
-            course = await session.scalar(
-                select(Course).where(Course.code == callback_data.code)
+            course_id = await session.scalar(
+                select(Course.id).where(Course.code == callback_data.code)
+            )
+            user_id = await session.scalar(
+                select(User.id).where(User.tg_id == self.event.from_user.id)
             )
 
-        if course:
-            await self.message.answer(
-                f"Course {course.name} has been started!"
-            )
+        if course_id and user_id:
+            await UserCourse.activate(course_id, user_id)
+            await self.message.answer("Course has been started!")
         else:
+            logger.error(
+                "Error activate course=%s for user=%s", course_id, user_id
+            )
             await self.message.answer(
-                "I can't find the selected course. Try starting another one"
+                "I can't activate the course, try another one"
             )
 
 
