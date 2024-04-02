@@ -3,13 +3,14 @@ import logging.config
 import os
 
 import aiogram.exceptions
-from aiogram import Bot, Dispatcher
+from aiogram import Bot, Dispatcher, md
 from aiogram.filters import CommandStart
 from aiogram.handlers import MessageHandler, CallbackQueryHandler
 from aiogram.types import InlineKeyboardButton
 from aiogram.utils.formatting import Text, Bold
 from aiogram.filters.callback_data import CallbackData
 from aiogram.utils.keyboard import InlineKeyboardMarkup
+from aiogram.enums import ParseMode
 from sqlalchemy import select
 from sqlalchemy_helpers.aio import get_or_create
 
@@ -52,11 +53,12 @@ class StartCommandHandler(MessageHandler):
     async def answer_available_courses(self, courses: list[Course]):
         for course in courses:
             await self.event.answer(
-                **Text(
-                    Bold(course.name),
-                    "\n\n",
-                    course.description
-                ).as_kwargs(),
+                f"*{md.quote(course.name)}*"
+                "\n\n"
+                f"{md.quote(course.description)}"
+                "\n\n"
+                f"{md.link('Link to the course', course.link)}",
+                parse_mode=ParseMode.MARKDOWN_V2,
                 reply_markup=InlineKeyboardMarkup(inline_keyboard=[
                     [
                         InlineKeyboardButton(
@@ -96,12 +98,12 @@ class CourseCallbackHandler(CallbackQueryHandler):
 
         if course_id and user_id:
             await UserCourse.activate(course_id, user_id)
-            await self.message.answer("Course has been started!")
+            await self.event.answer("Course has been started!")
         else:
             logger.error(
                 "Error activate course=%s for user=%s", course_id, user_id
             )
-            await self.message.answer(
+            await self.event.answer(
                 "I can't activate the course, try another one"
             )
 

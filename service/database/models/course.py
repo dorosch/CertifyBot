@@ -58,6 +58,7 @@ class Course(Model):
     code = Column(String, nullable=False)
     name = Column(String, nullable=False)
     description = Column(String, nullable=False)
+    link = Column(String, nullable=False)
     users = relationship(
         "User", secondary="user_course", back_populates="courses"
     )
