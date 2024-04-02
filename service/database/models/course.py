@@ -10,7 +10,9 @@ class UserCourse(Model):
 
 
 class Course(Model):
+    code = Column(String, nullable=False)
     name = Column(String, nullable=False)
+    description = Column(String, nullable=False)
     users = relationship("User", secondary="user_course", back_populates="courses")
     questions = relationship("Question", backref=backref("course", cascade="all,delete"), lazy=True)
 

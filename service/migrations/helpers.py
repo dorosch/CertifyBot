@@ -3,7 +3,7 @@ import json
 from alembic import op
 from sqlalchemy.sql import select, insert, delete
 
-from settings import SUPPORTED_COURCES
+from settings import SUPPORTED_COURSES
 from database.models import Course, Question, Answer
 
 
@@ -16,8 +16,8 @@ class CourseHelper:
     def create(course: str):
         session = op.get_bind()
 
-        course_name = SUPPORTED_COURCES[course]["NAME"]
-        course_questions = SUPPORTED_COURCES[course]["QUESTIONS"]
+        course_name = SUPPORTED_COURSES[course]["NAME"]
+        course_questions = SUPPORTED_COURSES[course]["QUESTIONS"]
 
         session.execute(
             insert(Course).values({
@@ -46,8 +46,8 @@ class CourseHelper:
     def remove(course: str):
         session = op.get_bind()
 
-        course_name = SUPPORTED_COURCES[course]["NAME"]
-        course_questions = SUPPORTED_COURCES[course]["QUESTIONS"]
+        course_name = SUPPORTED_COURSES[course]["NAME"]
+        course_questions = SUPPORTED_COURSES[course]["QUESTIONS"]
 
         for question in json.loads(course_questions.read_text()):
             answers = [answer["text"] for answer in question.pop("answers")]
