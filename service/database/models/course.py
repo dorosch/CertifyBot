@@ -14,7 +14,9 @@ class Course(Model):
     name = Column(String, nullable=False)
     description = Column(String, nullable=False)
     users = relationship("User", secondary="user_course", back_populates="courses")
-    questions = relationship("Question", backref=backref("course", cascade="all,delete"), lazy=True)
+    questions = relationship(
+        "Question", backref=backref("course", cascade="all,delete"), lazy=True
+    )
 
     def __str__(self) -> str:
-        return f"{self.id} - {self.name}"
+        return f"{self.id} - {self.name} ({self.code})"
