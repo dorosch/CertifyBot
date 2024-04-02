@@ -11,7 +11,6 @@ class User(Model):
     username = Column(String, nullable=True)
     language_code = Column(String, nullable=True)
     courses = relationship("Course", secondary="user_course", back_populates="users")
-    answers = relationship("AnswerHistory", backref="user", lazy=True)
 
     def __str__(self) -> str:
         return f"{self.tg_id} - {self.username or 'anonymous'}"

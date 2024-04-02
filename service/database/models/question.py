@@ -37,8 +37,8 @@ class AnswerHistory(Model):
     user_id = Column(Integer, ForeignKey("user.id"), nullable=False)
     question_id = Column(Integer, ForeignKey("question.id"), nullable=False)
     is_correct = Column(Boolean, nullable=False)
+    user = relationship("User")
     question = relationship("Question")
-    user = relationship("User", backref="answers")
 
     def __str__(self) -> str:
         return f"{self.id} - Question {self.question_id}"
