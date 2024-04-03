@@ -9,19 +9,23 @@ from database.models import Course, Question, Answer
 
 class CourseHelper:
     """This helper is used in migrations to reduce code duplication."""
-    # TODO: Fix reverse migrations with answer_question_id_fk constraint
-    #       reproduction: alembic downgrade -3
 
     @staticmethod
     def create(course: str):
         session = op.get_bind()
 
+        course_code = course
         course_name = SUPPORTED_COURSES[course]["NAME"]
+        course_link = SUPPORTED_COURSES[course]["LINK"]
+        course_description = SUPPORTED_COURSES[course]["DESCRIPTION"]
         course_questions = SUPPORTED_COURSES[course]["QUESTIONS"]
 
         session.execute(
             insert(Course).values({
-                "name": course_name
+                "code": course_code,
+                "name": course_name,
+                "link": course_link,
+                "description": course_description
             })
         )
         course_id = session.execute(
@@ -37,10 +41,10 @@ class CourseHelper:
             question_id = session.execute(
                 select(Question.id).where(Question.text == question["text"])
             ).scalar()
-
             session.execute(
                 insert(Answer).values([{**answer, "question_id": question_id} for answer in answers])
             )
+            session.commit()
 
     @staticmethod
     def remove(course: str):
@@ -58,7 +62,9 @@ class CourseHelper:
             session.execute(
                 delete(Question).where(Question.text == question["text"])
             )
+            session.commit()
 
         session.execute(
             delete(Course).where(Course.name == course_name)
         )
+        session.commit()
