@@ -1,13 +1,14 @@
 import asyncio
 import logging.config
 import os
+from string import ascii_uppercase
 
 import aiogram.exceptions
 from aiogram import Bot, Dispatcher, md
+from aiogram.exceptions import TelegramBadRequest
 from aiogram.filters import CommandStart
 from aiogram.handlers import MessageHandler, CallbackQueryHandler
-from aiogram.types import InlineKeyboardButton
-from aiogram.utils.formatting import Text, Bold
+from aiogram.types import InlineKeyboardButton, CallbackQuery
 from aiogram.filters.callback_data import CallbackData
 from aiogram.utils.keyboard import InlineKeyboardMarkup
 from aiogram.enums import ParseMode
@@ -22,6 +23,18 @@ logging.config.dictConfig(settings.LOGGING_CONFIG)
 logger = logging.getLogger(__name__)
 
 dispatcher = Dispatcher()
+
+
+class CourseCallbackData(CallbackData, prefix="course"):
+    code: str
+
+
+class QuestionCallbackData(CallbackData, prefix="question"):
+    answers: int
+    position: int
+    is_correct: bool
+    course_id: int
+    user_id: int
 
 
 @dispatcher.message(CommandStart())
@@ -72,10 +85,6 @@ class StartCommandHandler(MessageHandler):
             )
 
 
-class CourseCallbackData(CallbackData, prefix="course"):
-    code: str
-
-
 @dispatcher.callback_query(CourseCallbackData.filter())
 class CourseCallbackHandler(CallbackQueryHandler):
     """
@@ -98,7 +107,7 @@ class CourseCallbackHandler(CallbackQueryHandler):
 
         if course_id and user_id:
             await UserCourse.activate(course_id, user_id)
-            await self.event.answer("Course has been started!")
+            await QuestionHelper(self.event).ask(course_id, user_id)
         else:
             logger.error(
                 "Error activate course=%s for user=%s", course_id, user_id
@@ -106,6 +115,93 @@ class CourseCallbackHandler(CallbackQueryHandler):
             await self.event.answer(
                 "I can't activate the course, try another one"
             )
+
+        await self.event.answer()
+
+
+@dispatcher.callback_query(QuestionCallbackData.filter())
+class AnswerCallbackHandler(CallbackQueryHandler):
+    async def handle(self):
+        keyboard = self.message.reply_markup.inline_keyboard
+        callback_data = QuestionCallbackData.unpack(self.callback_data)
+
+        for index, button in enumerate(keyboard[0]):
+            if callback_data.position != index:
+                continue
+
+            if callback_data.is_correct:
+                if not button.text.startswith("✅"):
+                    button.text = f"✅ {button.text}"
+            else:
+                if not button.text.startswith("❌"):
+                    button.text = f"❌ {button.text}"
+
+        answers = sum(1 for button in keyboard[0] if button.text.startswith("✅"))
+        has_errors = any(True for button in keyboard[0] if button.text.startswith("❌"))
+
+        if has_errors or callback_data.answers == answers:
+            # TODO: Write answer result to the AnswerHistory model
+
+            await self.message.edit_text(
+                ("❌ " if has_errors else "✅ ") + self.message.md_text,
+                parse_mode=ParseMode.MARKDOWN_V2
+            )
+
+            if has_errors:
+                await self.event.answer("Incorrect")
+            else:
+                await self.event.answer("Correct")
+
+            await QuestionHelper(self.event).ask(
+                callback_data.course_id, callback_data.user_id
+            )
+        else:
+            try:
+                await self.message.edit_reply_markup(
+                    reply_markup=InlineKeyboardMarkup(inline_keyboard=keyboard)
+                )
+            except TelegramBadRequest:
+                pass
+
+            await self.event.answer()
+
+
+class QuestionHelper:
+    def __init__(self, event: CallbackQuery):
+        self.event = event
+
+    async def ask(self, course_id: int, user_id: int):
+        question = await Course.next_question(course_id, user_id)
+
+        if not question:
+            return await self.event.message.answer(
+                "You successfull finished this course!!1"
+            )
+
+        text = f"*{md.quote(question.text)}*\n\n"
+
+        for index, answer in enumerate(question.answers):
+            text += f"{ascii_uppercase[index]}\) {md.quote(answer.text)}\n\n"
+
+        await self.event.message.answer(
+            text,
+            parse_mode=ParseMode.MARKDOWN_V2,
+            reply_markup=InlineKeyboardMarkup(inline_keyboard=[
+                [
+                    InlineKeyboardButton(
+                        text=ascii_uppercase[index],
+                        callback_data=QuestionCallbackData(
+                            position=index,
+                            is_correct=answer.is_correct,
+                            answers=sum(1 for a in question.answers if a.is_correct),
+                            course_id=course_id,
+                            user_id=user_id
+                        ).pack()
+                    )
+                    for index, answer in enumerate(question.answers)
+                ]
+            ])
+        )
 
 
 async def main():
