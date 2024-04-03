@@ -18,7 +18,7 @@ class PreviewMixin:
 class Question(PreviewMixin, Model):
     course_id = Column(Integer, ForeignKey("course.id"))
     text = Column(String, nullable=False)
-    answers = relationship("Answer", backref="question", lazy=True)
+    answers = relationship("Answer", back_populates="question", lazy="joined")
 
     def __str__(self) -> str:
         return f"{self.id} - {self.preview()}"
@@ -28,6 +28,7 @@ class Answer(PreviewMixin, Model):
     question_id = Column(Integer, ForeignKey("question.id"))
     text = Column(String, nullable=False)
     is_correct = Column(Boolean, default=False, nullable=False)
+    question = relationship("Question", back_populates="answers")
 
     def __str__(self) -> str:
         return f"{self.id} - {self.preview()}"

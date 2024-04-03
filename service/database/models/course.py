@@ -1,5 +1,8 @@
+from typing import Optional
+
 from sqlalchemy import (
-    update, Column, String, Integer, ForeignKey, Boolean, UniqueConstraint
+    select, update, Column, String, Integer, ForeignKey,
+    Boolean, UniqueConstraint, func
 )
 from sqlalchemy.dialects.postgresql import insert
 from sqlalchemy.orm import relationship, backref
@@ -7,6 +10,7 @@ from sqlalchemy.orm import relationship, backref
 from database import async_session
 
 from .base import Model
+from .question import Question
 
 
 class UserCourse(Model):
@@ -68,3 +72,23 @@ class Course(Model):
 
     def __str__(self) -> str:
         return f"{self.id} - {self.name} ({self.code})"
+
+    @staticmethod
+    async def next_question(course_id: int, user_id: int) -> Optional["Question"]:
+        # TODO: Exclude already correct answered questions from AnswerHistory
+
+        async with async_session() as session:
+            return await session.scalar(
+                select(
+                    Question
+                ).join(
+                    Course,
+                    Course.id == Question.course_id
+                ).where(
+                    Course.id == course_id
+                ).order_by(
+                    func.random()
+                ).limit(
+                    1
+                )
+            )
