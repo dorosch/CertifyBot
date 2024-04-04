@@ -6,7 +6,7 @@ from string import ascii_uppercase
 import aiogram.exceptions
 from aiogram import Bot, Dispatcher, md
 from aiogram.exceptions import TelegramBadRequest
-from aiogram.filters import CommandStart
+from aiogram.filters import CommandStart, Command
 from aiogram.handlers import MessageHandler, CallbackQueryHandler
 from aiogram.types import InlineKeyboardButton, CallbackQuery
 from aiogram.filters.callback_data import CallbackData
@@ -15,11 +15,12 @@ from aiogram.enums import ParseMode
 from sqlalchemy import select
 from sqlalchemy_helpers.aio import get_or_create
 
-import settings
+from settings import LOGGING_CONFIG
 from database import async_session
 from database.models import User, Course, UserCourse
+from services import Lexicon
 
-logging.config.dictConfig(settings.LOGGING_CONFIG)
+logging.config.dictConfig(LOGGING_CONFIG)
 logger = logging.getLogger(__name__)
 
 dispatcher = Dispatcher()
@@ -83,6 +84,16 @@ class StartCommandHandler(MessageHandler):
                     ]
                 ])
             )
+
+
+@dispatcher.message(Command("change"))
+class ChangeCommandHandler(MessageHandler):
+    """Change the current active course."""
+
+
+@dispatcher.message(Command("progress"))
+class ProgressCommandHandler(MessageHandler):
+    """Show your progress on the course."""
 
 
 @dispatcher.callback_query(CourseCallbackData.filter())
@@ -210,6 +221,7 @@ async def main():
     bot = Bot(token=os.environ["TOKEN"])
 
     try:
+        await bot.set_my_commands(Lexicon.menu_commands)
         await dispatcher.start_polling(bot)
     finally:
         try:
