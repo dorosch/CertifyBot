@@ -16,6 +16,7 @@ services:
     container_name: app
     restart: always
     environment:
+      TOKEN: $TOKEN
       <<: *common-variables
     depends_on:
       database:
