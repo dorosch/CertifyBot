@@ -1,0 +1,22 @@
+name: Delpoy
+
+on:
+  push:
+    branches: [main]
+
+jobs:
+  deploy:
+    runs-on: self-hosted
+    needs: tests
+
+    steps:
+      - name: Check out repository code
+        uses: actions/checkout@v3
+
+      - name: Build containers
+        run: |
+          docker compose build
+
+      - name: Start containers
+        run: |
+          docker compose up -d
