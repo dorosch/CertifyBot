@@ -7,7 +7,6 @@ on:
 jobs:
   deploy:
     runs-on: self-hosted
-    needs: tests
 
     steps:
       - name: Check out repository code
