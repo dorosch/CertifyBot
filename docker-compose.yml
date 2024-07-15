@@ -4,6 +4,7 @@ x-common-variables: &common-variables
   POSTGRES_PORT: 5432
   POSTGRES_USER: "user"
   POSTGRES_PASSWORD: "password"
+  PYTHONDONTWRITEBYTECODE: "1"
 
 services:
   app:
