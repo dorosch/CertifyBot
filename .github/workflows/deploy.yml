@@ -18,4 +18,4 @@ jobs:
 
       - name: Start containers
         run: |
-          docker compose up -d
+          docker compose up --env TOKEN=${{ secrets.TOKEN }} -d

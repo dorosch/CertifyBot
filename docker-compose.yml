@@ -22,9 +22,7 @@ services:
         condition: service_healthy
     volumes:
       - ./service/:/app
-    command: sh -c "
-      alembic upgrade head ||
-      python3 main.py"
+    command: "python3 main.py"
 
   admin:
     build:
