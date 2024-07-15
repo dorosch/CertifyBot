@@ -20,4 +20,4 @@ jobs:
         env:
           TOKEN: ${{ secrets.TOKEN }}
         run: |
-          TOKEN=$env:SUPER_SECRET docker compose up -d
+          TOKEN=$TOKEN docker compose up -d
