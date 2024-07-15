@@ -1,5 +1,4 @@
-# Build stage
-FROM python:3.10-alpine
+FROM python:3.11-alpine
 
 ARG APP_TYPE
 
