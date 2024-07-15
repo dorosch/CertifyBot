@@ -17,5 +17,7 @@ jobs:
           docker compose build
 
       - name: Start containers
+        env:
+          TOKEN: ${{ secrets.TOKEN }}
         run: |
           TOKEN=${{ secrets.TOKEN }} docker compose up -d
