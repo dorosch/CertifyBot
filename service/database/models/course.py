@@ -10,7 +10,7 @@ from sqlalchemy.orm import relationship, backref
 from database import async_session
 
 from .base import Model
-from .question import Question
+from .question import Question, AnswerHistory
 
 
 class UserCourse(Model):
@@ -75,8 +75,6 @@ class Course(Model):
 
     @staticmethod
     async def next_question(course_id: int, user_id: int) -> Optional["Question"]:
-        # TODO: Exclude already correct answered questions from AnswerHistory
-
         async with async_session() as session:
             return await session.scalar(
                 select(
@@ -85,7 +83,15 @@ class Course(Model):
                     Course,
                     Course.id == Question.course_id
                 ).where(
-                    Course.id == course_id
+                    Course.id == course_id,
+                    Question.id.notin_(
+                        select(
+                            AnswerHistory.question_id
+                        ).where(
+                            AnswerHistory.user_id == user_id,
+                            AnswerHistory.is_correct == True
+                        ).subquery()
+                    )
                 ).order_by(
                     func.random()
                 ).limit(
